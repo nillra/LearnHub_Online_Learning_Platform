@@ -3,16 +3,25 @@ const cors = require("cors");
 const dotenv = require("dotenv");
 const connectDB = require("./config/db");
 
-dotenv.config();
-connectDB();
+dotenv.config();        // 1️⃣ Load env
+connectDB();            // 2️⃣ Connect DB
 
 const app = express();
+
 app.use(cors());
 app.use(express.json());
 
-app.use("/api/users", require("./routers/userRoutes"));
-app.use("/api/admin", require("./routers/adminRoutes"));
-
-app.listen(process.env.PORT, () => {
-  console.log(`Server running on port ${process.env.PORT}`);
+// temporary test route
+app.get("/", (req, res) => {
+  res.send("Backend is running");
 });
+
+const PORT = process.env.PORT || 5000;
+
+app.listen(PORT, () => {
+  console.log(`Server running on port ${PORT}`);
+});
+
+app.use("/api/users", require("./routers/userRoutes"));
+
+app.use("/api/admin", require("./routers/adminRoutes"));
