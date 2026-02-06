@@ -10,22 +10,22 @@ const courseSchema = new mongoose.Schema(
 
     C_educator: {
       type: String,
-      required: true,
+      required: [true,"name is required"],
     },
 
     C_categories: {
       type: String,
-      required: true,
+      required: [true,"C_categories is required"],
     },
 
     C_title: {
       type: String,
-      required: true,
+      required: [true,"C_title is required"],
     },
 
     C_description: {
       type: String,
-      required: true,
+      required: [true,"C_description is required"],
     },
 
     sections: {

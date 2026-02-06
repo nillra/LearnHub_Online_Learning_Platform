@@ -1,6 +1,7 @@
 const User = require("../schemas/userModel");
 const Course = require("../schemas/courseModel");
 const EnrolledCourse = require("../schemas/enrolledCourseModel");
+const CoursePayment = require("../schemas/coursePaymentModel");
 
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
@@ -103,6 +104,20 @@ exports.enrollCourse = async (req, res) => {
       return res.status(404).json({ message: "Course not found" });
     }
 
+    // 🔐 CHECK PAYMENT FIRST
+    const payment = await CoursePayment.findOne({
+      userID: req.user.id,
+      courseID,
+      paymentStatus: "SUCCESS",
+    });
+
+    if (!payment) {
+      return res
+        .status(403)
+        .json({ message: "Please purchase the course before enrolling" });
+    }
+
+    // ❌ check already enrolled
     const alreadyEnrolled = await EnrolledCourse.findOne({
       userID: req.user.id,
       courseID,
@@ -112,11 +127,13 @@ exports.enrollCourse = async (req, res) => {
       return res.status(400).json({ message: "Already enrolled in this course" });
     }
 
+    // ✅ enroll student
     const enrollment = await EnrolledCourse.create({
       userID: req.user.id,
       courseID,
     });
 
+    // increase enrolled count
     course.enrolled += 1;
     await course.save();
 
@@ -129,6 +146,7 @@ exports.enrollCourse = async (req, res) => {
   }
 };
 
+
 /* =========================
    GET MY ENROLLED COURSES
 ========================= */
@@ -138,6 +156,55 @@ exports.getMyCourses = async (req, res) => {
       .populate("courseID");
 
     res.json(courses);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+};
+
+
+
+
+
+
+/* =========================
+   COURSE PAYMENT
+========================= */
+exports.payForCourse = async (req, res) => {
+  try {
+    const { courseID } = req.body;
+
+    if (!courseID) {
+      return res.status(400).json({ message: "Course ID required" });
+    }
+
+    const course = await Course.findById(courseID);
+    if (!course) {
+      return res.status(404).json({ message: "Course not found" });
+    }
+
+    // Check already paid
+    const alreadyPaid = await CoursePayment.findOne({
+      userID: req.user.id,
+      courseID,
+      paymentStatus: "SUCCESS",
+    });
+
+    if (alreadyPaid) {
+      return res.status(400).json({ message: "Course already purchased" });
+    }
+
+    // Mock payment success
+    const payment = await CoursePayment.create({
+      userID: req.user.id,
+      courseID,
+      amount: course.C_price,
+      paymentStatus: "SUCCESS",
+    });
+
+    res.status(201).json({
+      message: "Payment successful",
+      payment,
+    });
   } catch (error) {
     res.status(500).json({ error: error.message });
   }

@@ -17,3 +17,14 @@ router.post("/enroll", protect, enrollCourse);
 router.get("/my-courses", protect, getMyCourses);
 
 module.exports = router;
+
+const {
+  registerUser,
+  loginUser,
+  enrollCourse,
+  getMyCourses,
+  payForCourse,
+} = require("../controllers/userControllers");
+
+router.post("/pay", protect, payForCourse);
+
