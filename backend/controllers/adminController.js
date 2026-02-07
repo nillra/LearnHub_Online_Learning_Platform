@@ -31,7 +31,7 @@ exports.addCourse = async (req, res) => {
   }
 };
 
-// 📄 GET ALL COURSES
+//  GET ALL COURSES
 exports.getAllCourses = async (req, res) => {
   try {
     const courses = await Course.find().populate("userID", "name email");
@@ -42,7 +42,7 @@ exports.getAllCourses = async (req, res) => {
   }
 };
 
-// ❌ DELETE COURSE
+//  DELETE COURSE
 exports.deleteCourse = async (req, res) => {
   try {
     const course = await Course.findById(req.params.id);

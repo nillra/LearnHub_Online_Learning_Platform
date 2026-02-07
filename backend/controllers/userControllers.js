@@ -117,7 +117,7 @@ exports.enrollCourse = async (req, res) => {
         .json({ message: "Please purchase the course before enrolling" });
     }
 
-    // ❌ check already enrolled
+    //  check already enrolled
     const alreadyEnrolled = await EnrolledCourse.findOne({
       userID: req.user.id,
       courseID,
@@ -127,7 +127,7 @@ exports.enrollCourse = async (req, res) => {
       return res.status(400).json({ message: "Already enrolled in this course" });
     }
 
-    // ✅ enroll student
+    //  enroll student
     const enrollment = await EnrolledCourse.create({
       userID: req.user.id,
       courseID,
