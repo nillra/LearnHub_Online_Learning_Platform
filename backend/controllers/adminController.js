@@ -1,25 +1,24 @@
 const Course = require("../schemas/courseModel");
 
-// ➕ ADD COURSE (Teacher)
 exports.addCourse = async (req, res) => {
   try {
     const {
-      C_educator,
-      C_categories,
       C_title,
       C_description,
-      sections,
+      C_categories,
       C_price,
+      sections,
     } = req.body;
 
+    // req.user comes from JWT (protect middleware)
     const course = await Course.create({
-      userID: req.user.id, // from JWT
-      C_educator,
-      C_categories,
+      userID: req.user.id,
+      C_educator: req.user.name,   // ✅ FIX HERE
       C_title,
       C_description,
-      sections,
+      C_categories,
       C_price,
+      sections,
     });
 
     res.status(201).json({
@@ -27,7 +26,8 @@ exports.addCourse = async (req, res) => {
       course,
     });
   } catch (error) {
-    res.status(500).json({ error: error.message });
+    console.error("Add course error:", error.message);
+    res.status(500).json({ message: error.message });
   }
 };
 

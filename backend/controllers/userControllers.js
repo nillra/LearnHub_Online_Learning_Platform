@@ -167,14 +167,29 @@ exports.getMyCourses = async (req, res) => {
 
 
 /* =========================
-   COURSE PAYMENT
+   COURSE PAYMENT (SIMULATION)
 ========================= */
 exports.payForCourse = async (req, res) => {
   try {
-    const { courseID } = req.body;
+    const {
+      courseID,
+      cardholdername,
+      cardnumber,
+      cvv,
+      expmonthyear,
+    } = req.body;
 
-    if (!courseID) {
-      return res.status(400).json({ message: "Course ID required" });
+    // basic validation
+    if (
+      !courseID ||
+      !cardholdername ||
+      !cardnumber ||
+      !cvv ||
+      !expmonthyear
+    ) {
+      return res
+        .status(400)
+        .json({ message: "All payment fields are required" });
     }
 
     const course = await Course.findById(courseID);
@@ -182,7 +197,7 @@ exports.payForCourse = async (req, res) => {
       return res.status(404).json({ message: "Course not found" });
     }
 
-    // Check already paid
+    // check if already paid
     const alreadyPaid = await CoursePayment.findOne({
       userID: req.user.id,
       courseID,
@@ -190,22 +205,32 @@ exports.payForCourse = async (req, res) => {
     });
 
     if (alreadyPaid) {
-      return res.status(400).json({ message: "Course already purchased" });
+      return res.status(400).json({
+        message: "Course already purchased",
+      });
     }
 
-    // Mock payment success
+    // 🔹 SIMULATE PAYMENT SUCCESS
     const payment = await CoursePayment.create({
       userID: req.user.id,
       courseID,
       amount: course.C_price,
+      cardDetails: {
+        cardholdername,
+        cardnumber,
+        cvv,
+        expmonthyear,
+      },
       paymentStatus: "SUCCESS",
+      paymentType: "SIMULATION",
     });
 
     res.status(201).json({
-      message: "Payment successful",
+      message: "Payment successful (simulated)",
       payment,
     });
   } catch (error) {
     res.status(500).json({ error: error.message });
   }
 };
+

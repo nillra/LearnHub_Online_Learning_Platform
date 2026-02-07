@@ -19,15 +19,35 @@ const coursePaymentSchema = new mongoose.Schema(
       required: true,
     },
 
+    // 🔹 PAYMENT SIMULATION DETAILS
+    cardDetails: {
+      cardholdername: {
+        type: String,
+        required: true,
+      },
+      cardnumber: {
+        type: String, // string to avoid precision loss
+        required: true,
+      },
+      cvv: {
+        type: String,
+        required: true,
+      },
+      expmonthyear: {
+        type: String,
+        required: true,
+      },
+    },
+
     paymentStatus: {
       type: String,
       enum: ["SUCCESS", "FAILED"],
       default: "SUCCESS",
     },
 
-    paymentMode: {
+    paymentType: {
       type: String,
-      default: "ONLINE",
+      default: "SIMULATION",
     },
   },
   { timestamps: true }
