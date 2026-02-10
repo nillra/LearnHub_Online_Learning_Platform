@@ -1,21 +1,36 @@
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 
 function NavBar() {
-  return (
-    <nav className="navbar navbar-expand-lg navbar-dark bg-dark">
-      <div className="container">
-        <Link className="navbar-brand" to="/">LearnHub</Link>
+  const navigate = useNavigate();
+  const role = localStorage.getItem("role");
 
-        <div className="collapse navbar-collapse">
-          <ul className="navbar-nav ms-auto">
-            <li className="nav-item">
-              <Link className="nav-link" to="/login">Login</Link>
-            </li>
-            <li className="nav-item">
-              <Link className="nav-link" to="/register">Register</Link>
-            </li>
-          </ul>
+  const logout = () => {
+    localStorage.clear();
+    navigate("/login");
+  };
+
+  return (
+    <nav className="navbar navbar-expand-lg navbar-light bg-white shadow-sm">
+      <div className="container-fluid px-4">
+        {/* LEFT */}
+        <Link className="navbar-brand fw-bold" to="/">
+          Study App
+        </Link>
+
+        {/* CENTER */}
+        {/* CENTER -> Changed to RIGHT using ms-auto */}
+        <div className="ms-auto">
+        <Link className="me-3 text-decoration-none" to="/">Home</Link>
+        {!role && <Link className="me-3 text-decoration-none" to="/login">Login</Link>}
+        {!role && <Link className="text-decoration-none" to="/register">Register</Link>}
         </div>
+
+        {/* RIGHT */}
+        {role && (
+          <button onClick={logout} className="btn btn-outline-danger btn-sm">
+            Logout
+          </button>
+        )}
       </div>
     </nav>
   );

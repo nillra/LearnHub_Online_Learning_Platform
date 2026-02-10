@@ -31,5 +31,21 @@ router.delete(
   authorizeRoles("admin"),
   deleteCourse
 );
+const upload = require("../middlewares/videoUpload");
+const { addCourseWithVideo } = require("../controllers/adminController");
+
+router.post(
+  "/add-course",
+  protect,
+  upload.single("video"),
+  addCourseWithVideo
+);
+
+
+
 
 module.exports = router;
+
+
+
+

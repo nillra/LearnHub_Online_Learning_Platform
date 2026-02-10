@@ -19,5 +19,9 @@ router.post("/login", loginUser);
 router.post("/pay", protect, payForCourse);
 router.post("/enroll", protect, enrollCourse);
 router.get("/my-courses", protect, getMyCourses);
+// router.get("/allcourses", protect, allCourses);
 
+// Add this route to your existing router
+const { getAllCourses } = require("../controllers/userControllers");
+router.get("/all-courses", getAllCourses);
 module.exports = router;

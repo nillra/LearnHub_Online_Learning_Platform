@@ -58,3 +58,44 @@ exports.deleteCourse = async (req, res) => {
     res.status(500).json({ error: error.message });
   }
 };
+
+
+exports.addCourseWithVideo = async (req, res) => {
+  try {
+    const {
+      C_title,
+      C_description,
+      C_categories,
+      C_educator,
+      C_price,
+      sectionTitle,
+    } = req.body;
+
+    if (!req.file) {
+      return res.status(400).json({ message: "Video required" });
+    }
+
+    const videoUrl = `/videos/${req.file.filename}`;
+
+    const course = await Course.create({
+      C_title,
+      C_description,
+      C_categories,
+      C_educator,
+      C_price,
+      sections: [
+        {
+          title: sectionTitle,
+          videoUrl,
+        },
+      ],
+    });
+
+    res.status(201).json({
+      message: "Course added with video",
+      course,
+    });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+};

@@ -25,3 +25,11 @@ app.listen(PORT, () => {
 app.use("/api/users", require("./routers/userRoutes"));
 
 app.use("/api/admin", require("./routers/adminRoutes"));
+
+
+const path = require("path");
+
+app.use(
+  "/videos",
+  express.static(path.join(__dirname, "uploads/videos"))
+);

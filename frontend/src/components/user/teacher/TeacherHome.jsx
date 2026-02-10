@@ -1,4 +1,6 @@
-import { NavLink, Outlet } from "react-router-dom";
+import { NavLink, Routes, Route } from "react-router-dom";
+import AddCourse from "./AddCourse";
+import AllCourses from "./AllCourses";
 
 function TeacherHome() {
   return (
@@ -7,31 +9,21 @@ function TeacherHome() {
 
       <ul className="nav nav-tabs mb-4">
         <li className="nav-item">
-          <NavLink
-            to=""
-            end
-            className={({ isActive }) =>
-              `nav-link ${isActive ? "active fw-bold" : ""}`
-            }
-          >
+          <NavLink end to="" className="nav-link">
             All Courses
           </NavLink>
         </li>
-
         <li className="nav-item">
-          <NavLink
-            to="add-course"
-            className={({ isActive }) =>
-              `nav-link ${isActive ? "active fw-bold" : ""}`
-            }
-          >
+          <NavLink to="add-course" className="nav-link">
             Add Course
           </NavLink>
         </li>
       </ul>
 
-      {/* Child pages */}
-      <Outlet />
+      <Routes>
+        <Route index element={<AllCourses />} />
+        <Route path="add-course" element={<AddCourse />} />
+      </Routes>
     </div>
   );
 }

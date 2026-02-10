@@ -159,7 +159,10 @@ exports.getMyCourses = async (req, res) => {
   } catch (error) {
     res.status(500).json({ error: error.message });
   }
+
+ 
 };
+
 
 
 
@@ -234,3 +237,18 @@ exports.payForCourse = async (req, res) => {
   }
 };
 
+
+
+/* =========================
+   GET ALL AVAILABLE COURSES
+========================= */
+exports.getAllCourses = async (req, res) => {
+  try {
+    // We don't need to 'require' Course here because it is 
+    // already imported at the top of this file
+    const courses = await Course.find({}); 
+    res.json(courses);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+};
