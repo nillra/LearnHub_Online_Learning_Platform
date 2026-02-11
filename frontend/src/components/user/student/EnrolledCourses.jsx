@@ -13,7 +13,7 @@ function EnrolledCourses() {
       .then((res) => setEnrolled(res.data))
       .catch((err) => console.error(err));
   }, []);
-
+  console.log(enrolled);
   return (
     <div className="table-responsive">
       <table className="table table-bordered align-middle">
@@ -36,9 +36,9 @@ function EnrolledCourses() {
             <tr key={item._id}>
               {/* MongoDB _id used as course identity */}
               <td>{item.courseID?._id}</td>
-              <td className="fw-bold">{item.courseID?.C_name}</td>
+              <td className="fw-bold">{item.courseID?.C_title}</td>
               <td>{item.courseID?.C_educator}</td>
-              <td>{item.courseID?.C_category}</td>
+              <td>{item.courseID?.C_categories}</td>
               <td>
                 <button
                   className="btn btn-success btn-sm"

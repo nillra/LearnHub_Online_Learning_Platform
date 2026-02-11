@@ -16,16 +16,18 @@ function NavBar() {
         <Link className="navbar-brand fw-bold" to="/">
           Study App
         </Link>
-
+        
         {/* CENTER */}
         {/* CENTER -> Changed to RIGHT using ms-auto */}
         <div className="ms-auto">
-        <Link className="me-3 text-decoration-none" to="/">Home</Link>
+        <Link className="me-3 text-decoration-none" to="/"> Hello {role} Home </Link>
         {!role && <Link className="me-3 text-decoration-none" to="/login">Login</Link>}
         {!role && <Link className="text-decoration-none" to="/register">Register</Link>}
         </div>
 
+        
         {/* RIGHT */}
+        
         {role && (
           <button onClick={logout} className="btn btn-outline-danger btn-sm">
             Logout
