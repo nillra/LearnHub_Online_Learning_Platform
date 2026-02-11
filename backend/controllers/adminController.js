@@ -31,12 +31,14 @@ exports.addCourse = async (req, res) => {
   }
 };
 
-//  GET ALL COURSES
+/* =========================
+   GET ALL COURSES (FOR TEACHER/ADMIN)
+========================= */
 exports.getAllCourses = async (req, res) => {
   try {
-    const courses = await Course.find().populate("userID", "name email");
-
-    res.json(courses);
+    // Fetches every course in the database
+    const courses = await Course.find({}); 
+    res.status(200).json(courses);
   } catch (error) {
     res.status(500).json({ error: error.message });
   }
@@ -96,6 +98,7 @@ exports.addCourseWithVideo = async (req, res) => {
       course,
     });
   } catch (error) {
-    res.status(500).json({ error: error.message });
+  console.log("ERROR:", error); // 👈 Add this
+  res.status(500).json({ error: error.message });
   }
 };

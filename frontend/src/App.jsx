@@ -7,7 +7,7 @@ import Register from "./components/common/Register";
 import AdminHome from "./components/admin/AdminHome";
 import TeacherHome from "./components/user/teacher/TeacherHome";
 import StudentHome from "./components/user/student/StudentHome";
-
+import CourseContent from "./components/user/student/CourseContent";
 function App() {
   return (
     <>
@@ -20,6 +20,7 @@ function App() {
         <Route path="/admin/*" element={<AdminHome />} />
         <Route path="/teacher/*" element={<TeacherHome />} />
         <Route path="/student/*" element={<StudentHome />} />
+        <Route path="/student/course/:id" element={<CourseContent />} />
       </Routes>
     </>
   );

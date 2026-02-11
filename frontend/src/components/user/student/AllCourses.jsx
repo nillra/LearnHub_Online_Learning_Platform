@@ -1,8 +1,12 @@
 import { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
+
 import API from "../../common/AxiosInstance";
 
 function AllCourses() {
   const [courses, setCourses] = useState([]);
+  const navigate = useNavigate();
+
 
   useEffect(() => {
     // Fetches all available courses from the database
@@ -14,48 +18,45 @@ function AllCourses() {
   const handleEnroll = async (courseID) => {
   try {
     // 1. Check if the student is already enrolled
-    // Fetches the current user's enrolled list from the backend
-    const enrolledRes = await API.get("/api/users/my-courses");
-    
-    // Check if the current courseID exists in their list
+    // Note: Removed '/api' prefix to match your backend router
+    const enrolledRes = await API.get("/users/my-courses");
     const isEnrolled = enrolledRes.data.some(
       (enrollment) => enrollment.courseID?._id === courseID
     );
 
-    if (isEnrolled) {
-      // If already enrolled, navigate to the course content page
-      alert("Redirecting to course content...");
-      window.location.href = `/student/course/${courseID}`; 
-      return;
-    }
+   if (isEnrolled) {
+  alert("Welcome back! Redirecting to your course.");
+  navigate(`/student/course/${courseID}`);
+  return;
+}
+
 
     // 2. If not enrolled, handle Payment Simulation
     try {
-      await API.post("/api/users/pay", {
+      await API.post("/users/pay", {
         courseID,
         cardholdername: localStorage.getItem("userName") || "Student User", 
-        cardnumber: "1234567890123456", // Simulation data
+        cardnumber: "1111222233334444", 
         cvv: "123",
-        expmonthyear: "12/2028"
+        expmonthyear: "12/28"
       });
     } catch (payErr) {
-      // If payment already exists but enrollment didn't finish, continue
+      // Handle the "already purchased" case if payment exists but enrollment didn't complete
       if (payErr.response?.data?.message !== "Course already purchased") {
         throw payErr;
       }
     }
 
     // 3. Perform the actual Enrollment
-    // The backend verifies successful payment before creating the record
-    await API.post("/student/enrolled-courses", { courseID });
+    await API.post("/users/enroll", { courseID });
     alert("Enrollment Successful!");
     
-    // Redirect to the Enrolled Courses tab to see the updated list
-    window.location.href = "/student/enrolled";
+    // Redirect to the Enrolled Courses tab
+    navigate(`/student/course/${courseID}`);
+
 
   } catch (err) {
-    console.error("Full Error Object:", err);
-    // Alerts the user to the specific backend error message
+    console.error("Enrollment Error Details:", err.response?.data);
     alert(err.response?.data?.message || "An error occurred during enrollment.");
   }
 };

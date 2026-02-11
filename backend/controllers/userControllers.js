@@ -146,21 +146,20 @@ exports.enrollCourse = async (req, res) => {
   }
 };
 
-
 /* =========================
    GET MY ENROLLED COURSES
 ========================= */
 exports.getMyCourses = async (req, res) => {
   try {
+    // This will now work because 'Course' is registered in courseModel.js
     const courses = await EnrolledCourse.find({ userID: req.user.id })
       .populate("courseID");
 
     res.json(courses);
   } catch (error) {
+    console.error("Populate Error:", error);
     res.status(500).json({ error: error.message });
   }
-
- 
 };
 
 

@@ -2,23 +2,25 @@ const express = require("express");
 const router = express.Router();
 
 const {
-  addCourse,
   getAllCourses,
   deleteCourse,
+  addCourseWithVideo,
 } = require("../controllers/adminController");
 
 const { protect, authorizeRoles } = require("../middlewares/authMiddleware");
+const upload = require("../middlewares/videoUpload");
 
 /* =========================
    COURSE ROUTES
 ========================= */
 
-// Only TEACHER can add course
+// Only TEACHER can add course with video
 router.post(
   "/add-course",
   protect,
   authorizeRoles("teacher"),
-  addCourse
+  upload.single("video"),
+  addCourseWithVideo
 );
 
 // Anyone can view courses
@@ -31,21 +33,5 @@ router.delete(
   authorizeRoles("admin"),
   deleteCourse
 );
-const upload = require("../middlewares/videoUpload");
-const { addCourseWithVideo } = require("../controllers/adminController");
-
-router.post(
-  "/add-course",
-  protect,
-  upload.single("video"),
-  addCourseWithVideo
-);
-
-
-
 
 module.exports = router;
-
-
-
-

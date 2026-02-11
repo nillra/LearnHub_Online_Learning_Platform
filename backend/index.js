@@ -26,10 +26,11 @@ app.use("/api/users", require("./routers/userRoutes"));
 
 app.use("/api/admin", require("./routers/adminRoutes"));
 
+app.use("/api/users", require("./routers/userRoutes"));
 
 const path = require("path");
 
 app.use(
   "/videos",
-  express.static(path.join(__dirname, "uploads/videos"))
+  express.static(path.join(__dirname, "uploads"))
 );
