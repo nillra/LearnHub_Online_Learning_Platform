@@ -45,21 +45,27 @@ exports.getAllCourses = async (req, res) => {
 };
 
 //  DELETE COURSE
+
 exports.deleteCourse = async (req, res) => {
   try {
-    const course = await Course.findById(req.params.id);
+    const courseId = req.params.id;
+
+    const course = await Course.findByIdAndDelete(courseId);
 
     if (!course) {
       return res.status(404).json({ message: "Course not found" });
     }
 
-    await course.deleteOne();
+    // 🔥 Delete all enrollments related to this course
+    await EnrolledCourse.deleteMany({ courseID: courseId });
 
-    res.json({ message: "Course deleted successfully" });
+    res.json({ message: "Course and related enrollments deleted" });
+
   } catch (error) {
-    res.status(500).json({ error: error.message });
+    res.status(500).json({ message: error.message });
   }
 };
+
 
 
 exports.addCourseWithVideo = async (req, res) => {
@@ -70,14 +76,23 @@ exports.addCourseWithVideo = async (req, res) => {
       C_categories,
       C_educator,
       C_price,
-      sectionTitle,
+      sectionTitles
     } = req.body;
 
-    if (!req.file) {
-      return res.status(400).json({ message: "Video required" });
+    if (!req.files || req.files.length === 0) {
+      return res.status(400).json({ message: "Videos required" });
     }
 
-    const videoUrl = `/videos/${req.file.filename}`;
+    const parsedTitles = JSON.parse(sectionTitles);
+
+    if (parsedTitles.length !== req.files.length) {
+      return res.status(400).json({ message: "Mismatch in sections and videos" });
+    }
+
+    const sections = req.files.map((file, index) => ({
+      title: parsedTitles[index],
+      videoUrl: `/videos/${file.filename}`,
+    }));
 
     const course = await Course.create({
       C_title,
@@ -85,20 +100,19 @@ exports.addCourseWithVideo = async (req, res) => {
       C_categories,
       C_educator,
       C_price,
-      sections: [
-        {
-          title: sectionTitle,
-          videoUrl,
-        },
-      ],
+      sections,
     });
 
     res.status(201).json({
-      message: "Course added with video",
+      message: "Course added successfully",
       course,
     });
+
   } catch (error) {
-  console.log("ERROR:", error); // 👈 Add this
-  res.status(500).json({ error: error.message });
+    console.error("ADD COURSE ERROR:", error);
+    res.status(500).json({ error: error.message });
   }
 };
+
+
+

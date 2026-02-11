@@ -1,8 +1,11 @@
 import { useEffect, useState } from "react";
 import API from "../../common/AxiosInstance";
+import { useNavigate } from "react-router-dom";
 
 function EnrolledCourses() {
   const [enrolled, setEnrolled] = useState([]);
+  const navigate = useNavigate();
+
 
   useEffect(() => {
     // Matches your backend router
@@ -24,7 +27,12 @@ function EnrolledCourses() {
           </tr>
         </thead>
         <tbody>
-          {enrolled.length > 0 ? enrolled.map((item) => (
+          {enrolled
+          .filter(item => item.courseID)
+          .length > 0 ? 
+          enrolled
+          .filter(item => item.courseID)
+          .map((item) => (
             <tr key={item._id}>
               {/* MongoDB _id used as course identity */}
               <td>{item.courseID?._id}</td>
@@ -32,7 +40,12 @@ function EnrolledCourses() {
               <td>{item.courseID?.C_educator}</td>
               <td>{item.courseID?.C_category}</td>
               <td>
-                <button className="btn btn-success btn-sm">GO TO</button>
+                <button
+                  className="btn btn-success btn-sm"
+                  onClick={() => navigate(`/student/course/${item.courseID?._id}`)}>
+                  GO TO
+                </button>
+
               </td>
             </tr>
           )) : (

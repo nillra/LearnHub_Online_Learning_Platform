@@ -34,3 +34,5 @@ app.use(
   "/videos",
   express.static(path.join(__dirname, "uploads"))
 );
+
+app.use("/api/users", require("./routers/userRoutes"));

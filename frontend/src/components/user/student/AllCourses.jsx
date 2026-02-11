@@ -1,87 +1,213 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-
 import API from "../../common/AxiosInstance";
 
 function AllCourses() {
   const [courses, setCourses] = useState([]);
+  const [selectedCourse, setSelectedCourse] = useState(null);
+  const [showPayment, setShowPayment] = useState(false);
+
+  const [cardData, setCardData] = useState({
+    cardholdername: "",
+    cardnumber: "",
+    cvv: "",
+    expmonthyear: "",
+  });
+
   const navigate = useNavigate();
 
-
+  // 🔹 Fetch all courses
   useEffect(() => {
-    // Fetches all available courses from the database
-    API.get("/users/all-courses") 
+    API.get("/users/all-courses")
       .then((res) => setCourses(res.data))
-      .catch((err) => console.error("Error fetching available courses:", err));
+      .catch((err) =>
+        console.error("Error fetching available courses:", err)
+      );
   }, []);
 
-  const handleEnroll = async (courseID) => {
-  try {
-    // 1. Check if the student is already enrolled
-    // Note: Removed '/api' prefix to match your backend router
-    const enrolledRes = await API.get("/users/my-courses");
-    const isEnrolled = enrolledRes.data.some(
-      (enrollment) => enrollment.courseID?._id === courseID
-    );
+  // 🔹 Handle Start Course
+  const handleEnroll = async (course) => {
+    try {
+      const enrolledRes = await API.get("/users/my-courses");
 
-   if (isEnrolled) {
-  alert("Welcome back! Redirecting to your course.");
-  navigate(`/student/course/${courseID}`);
-  return;
-}
+      const isEnrolled = enrolledRes.data.some(
+        (enrollment) => enrollment.courseID?._id === course._id
+      );
 
+      if (isEnrolled) {
+        navigate(`/student/course/${course._id}`);
+        return;
+      }
 
-    // 2. If not enrolled, handle Payment Simulation
+      // 🔥 If not enrolled → open payment modal
+      setSelectedCourse(course);
+      setShowPayment(true);
+    } catch (err) {
+      console.error(err);
+    }
+  };
+
+  // 🔹 Handle Payment
+  const handlePayment = async () => {
     try {
       await API.post("/users/pay", {
-        courseID,
-        cardholdername: localStorage.getItem("userName") || "Student User", 
-        cardnumber: "1111222233334444", 
-        cvv: "123",
-        expmonthyear: "12/28"
+        courseID: selectedCourse._id,
+        amount: selectedCourse.C_price,
+        cardholdername: cardData.cardholdername,
+        cardnumber: cardData.cardnumber,
+        cvv: cardData.cvv,
+        expmonthyear: cardData.expmonthyear,
       });
-    } catch (payErr) {
-      // Handle the "already purchased" case if payment exists but enrollment didn't complete
-      if (payErr.response?.data?.message !== "Course already purchased") {
-        throw payErr;
-      }
+
+      await API.post("/users/enroll", {
+        courseID: selectedCourse._id,
+      });
+
+      alert("Payment Successful & Enrolled!");
+
+      setShowPayment(false);
+      setCardData({
+        cardholdername: "",
+        cardnumber: "",
+        cvv: "",
+        expmonthyear: "",
+      });
+
+      navigate(`/student/course/${selectedCourse._id}`);
+    } catch (err) {
+      console.error(err);
+      alert("Payment Failed");
     }
-
-    // 3. Perform the actual Enrollment
-    await API.post("/users/enroll", { courseID });
-    alert("Enrollment Successful!");
-    
-    // Redirect to the Enrolled Courses tab
-    navigate(`/student/course/${courseID}`);
-
-
-  } catch (err) {
-    console.error("Enrollment Error Details:", err.response?.data);
-    alert(err.response?.data?.message || "An error occurred during enrollment.");
-  }
-};
+  };
 
   return (
-    <div className="row mt-3">
-      {courses.length > 0 ? courses.map((c) => (
-        <div className="col-md-4 mb-4" key={c._id}>
-          <div className="card h-100 shadow-sm border-0">
-            <div className="card-body">
-              {/* Field names match your MongoDB schema */}
-              <h5 className="card-title fw-bold">{c.C_name}</h5>
-              <p className="card-text text-muted mb-1">Educator: {c.C_educator}</p>
-              <h6 className="text-primary fw-bold">Price: ₹{c.C_price}</h6>
-              <button 
-                onClick={() => handleEnroll(c._id)} 
-                className="btn btn-primary w-100 mt-2"
-              >
-                Start Course
-              </button>
+    <div className="container mt-4">
+      <div className="row">
+        {courses.length > 0 ? (
+          courses.map((c) => (
+            <div className="col-md-4 mb-4" key={c._id}>
+              <div className="card shadow-sm border-0 h-100">
+                <div className="card-body">
+                  <h5 className="fw-bold">{c.C_title}</h5>
+                  <p className="text-muted mb-1">
+                    Educator: {c.C_educator}
+                  </p>
+                  <p className="text-muted">
+                    Category: {c.C_categories}
+                  </p>
+                  <h6 className="text-primary fw-bold">
+                    ₹{c.C_price}
+                  </h6>
+
+                  <button
+                    className="btn btn-primary w-100 mt-2"
+                    onClick={() => handleEnroll(c)}
+                  >
+                    Start Course
+                  </button>
+                </div>
+              </div>
+            </div>
+          ))
+        ) : (
+          <p className="text-center py-5">
+            No courses found in database.
+          </p>
+        )}
+      </div>
+
+      {/* 🔥 PAYMENT MODAL */}
+      {showPayment && (
+        <div
+          className="modal fade show d-block"
+          tabIndex="-1"
+          style={{ backgroundColor: "rgba(0,0,0,0.5)" }}
+        >
+          <div className="modal-dialog">
+            <div className="modal-content p-4">
+              <h4 className="mb-3">
+                Payment for {selectedCourse?.C_title}
+              </h4>
+
+              <p>
+                <strong>Price:</strong> ₹{selectedCourse?.C_price}
+              </p>
+
+              <input
+                type="text"
+                className="form-control mb-2"
+                placeholder="Card Holder Name"
+                value={cardData.cardholdername}
+                onChange={(e) =>
+                  setCardData({
+                    ...cardData,
+                    cardholdername: e.target.value,
+                  })
+                }
+              />
+
+              <input
+                type="text"
+                className="form-control mb-2"
+                placeholder="Card Number"
+                value={cardData.cardnumber}
+                onChange={(e) =>
+                  setCardData({
+                    ...cardData,
+                    cardnumber: e.target.value,
+                  })
+                }
+              />
+
+              <div className="row">
+                <div className="col">
+                  <input
+                    type="text"
+                    className="form-control mb-2"
+                    placeholder="MM/YYYY"
+                    value={cardData.expmonthyear}
+                    onChange={(e) =>
+                      setCardData({
+                        ...cardData,
+                        expmonthyear: e.target.value,
+                      })
+                    }
+                  />
+                </div>
+                <div className="col">
+                  <input
+                    type="text"
+                    className="form-control mb-2"
+                    placeholder="CVV"
+                    value={cardData.cvv}
+                    onChange={(e) =>
+                      setCardData({
+                        ...cardData,
+                        cvv: e.target.value,
+                      })
+                    }
+                  />
+                </div>
+              </div>
+
+              <div className="text-end mt-3">
+                <button
+                  className="btn btn-secondary me-2"
+                  onClick={() => setShowPayment(false)}
+                >
+                  Cancel
+                </button>
+
+                <button
+                  className="btn btn-success"
+                  onClick={handlePayment}
+                >
+                  Pay Now
+                </button>
+              </div>
             </div>
           </div>
         </div>
-      )) : (
-        <p className="text-center py-5">No courses found in database.</p>
       )}
     </div>
   );
