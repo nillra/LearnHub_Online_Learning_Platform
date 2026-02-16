@@ -57,136 +57,79 @@ function AddCourse() {
 
 
   return (
-    <div className="container mt-5">
-      <div className="card shadow-lg p-4">
-        <h2 className="text-center mb-4 text-primary">
-          Add New Course
-        </h2>
-
-        {/* Course Fields */}
-
-        <div className="mb-3">
-          <label className="form-label">Course Title</label>
-          <input
-            className="form-control"
-            value={course.C_title}
-            onChange={(e) =>
-              setCourse({ ...course, C_title: e.target.value })
-            }
-          />
-        </div>
-
-        <div className="mb-3">
-          <label className="form-label">Category</label>
-          <input
-            className="form-control"
-            value={course.C_categories}
-            onChange={(e) =>
-              setCourse({ ...course, C_categories: e.target.value })
-            }
-          />
-        </div>
-
-        <div className="mb-3">
-          <label className="form-label">Educator Name</label>
-          <input
-            className="form-control"
-            value={course.C_educator}
-            onChange={(e) =>
-              setCourse({ ...course, C_educator: e.target.value })
-            }
-          />
-        </div>
-
-        <div className="mb-3">
-          <label className="form-label">Price</label>
-          <input
-            type="number"
-            className="form-control"
-            value={course.C_price}
-            onChange={(e) =>
-              setCourse({ ...course, C_price: e.target.value })
-            }
-          />
-        </div>
-
-        <div className="mb-4">
-          <label className="form-label">Description</label>
-          <textarea
-            rows="3"
-            className="form-control"
-            value={course.C_description}
-            onChange={(e) =>
-              setCourse({ ...course, C_description: e.target.value })
-            }
-          />
-        </div>
-
-        <hr />
-
-        {/* Sections */}
-
-        <h5 className="mb-3">Course Sections</h5>
-
-        {sections.map((section, index) => (
-          <div
-            key={index}
-            className="border rounded p-3 mb-3 bg-light"
-          >
-            <div className="mb-3">
-              <label className="form-label">
-                Section Title {index + 1}
-              </label>
-              <input
-                className="form-control"
-                value={section.title}
-                onChange={(e) =>
-                  handleSectionChange(
-                    index,
-                    "title",
-                    e.target.value
-                  )
-                }
+    <div className="row justify-content-center">
+      <div className="col-lg-10">
+        <div className="card shadow-lg p-md-5 p-4">
+          <h3 className="fw-bold mb-4">Course Details</h3>
+          
+          <div className="row g-3">
+            <div className="col-md-8">
+              <label className="form-label fw-semibold">Course Title</label>
+              <input 
+                className="form-control form-control-lg border-2" 
+                placeholder="e.g. Master React in 30 Days"
+                value={course.C_title} 
+                onChange={(e) => setCourse({ ...course, C_title: e.target.value })} 
               />
             </div>
+            <div className="col-md-4">
+              <label className="form-label fw-semibold">Price (INR)</label>
+              <div className="input-group input-group-lg">
+                <span className="input-group-text border-2 bg-white">₹</span>
+                <input 
+                  type="number" className="form-control border-2" 
+                  value={course.C_price}
+                  onChange={(e) => setCourse({ ...course, C_price: e.target.value })}
+                />
+              </div>
+            </div>
 
-            <div>
-              <label className="form-label">
-                Upload Video
-              </label>
-              <input
-                type="file"
-                className="form-control"
-                accept="video/*"
-                onChange={(e) =>
-                  handleSectionChange(
-                    index,
-                    "video",
-                    e.target.files[0]
-                  )
-                }
-              />
+            <div className="col-md-6">
+              <label className="form-label fw-semibold">Category</label>
+              <input className="form-control border-2" value={course.C_categories} onChange={(e) => setCourse({ ...course, C_categories: e.target.value })} />
+            </div>
+            <div className="col-md-6">
+              <label className="form-label fw-semibold">Educator Name</label>
+              <input className="form-control border-2" value={course.C_educator} onChange={(e) => setCourse({ ...course, C_educator: e.target.value })} />
+            </div>
+
+            <div className="col-12">
+              <label className="form-label fw-semibold">Course Description</label>
+              <textarea rows="4" className="form-control border-2" value={course.C_description} onChange={(e) => setCourse({ ...course, C_description: e.target.value })} />
             </div>
           </div>
-        ))}
 
-        <div className="text-end mb-4">
-          <button
-            type="button"
-            className="btn btn-outline-primary"
-            onClick={addSection}
-          >
-            + Add More Section
-          </button>
-        </div>
+          <div className="mt-5">
+            <div className="d-flex justify-content-between align-items-center mb-4">
+               <h4 className="fw-bold text-secondary mb-0">Curriculum Content</h4>
+               <button type="button" className="btn btn-sm btn-outline-primary" onClick={addSection}>
+                 <i className="bi bi-plus-lg"></i> Add Section
+               </button>
+            </div>
 
-        <div className="d-grid">
-          <button
-            className="btn btn-primary btn-lg"
-            onClick={handleSubmit}
-          >
-            Submit Course
-          </button>
+            {sections.map((section, index) => (
+              <div key={index} className="card section-card mb-3 shadow-sm">
+                <div className="card-body">
+                  <div className="row align-items-end g-3">
+                    <div className="col-md-7">
+                      <label className="small text-uppercase fw-bold text-muted mb-1">Section {index + 1} Title</label>
+                      <input className="form-control bg-white" placeholder="What will they learn?" value={section.title} onChange={(e) => handleSectionChange(index, "title", e.target.value)} />
+                    </div>
+                    <div className="col-md-5">
+                      <label className="small text-uppercase fw-bold text-muted mb-1">Video Lesson</label>
+                      <input type="file" className="form-control bg-white" accept="video/*" onChange={(e) => handleSectionChange(index, "video", e.target.files[0])} />
+                    </div>
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+
+          <div className="d-grid mt-5">
+            <button className="btn btn-primary btn-lg shadow-sm" onClick={handleSubmit}>
+              Launch Course 🚀
+            </button>
+          </div>
         </div>
       </div>
     </div>
