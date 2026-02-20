@@ -192,9 +192,42 @@ function CourseContent() {
               </video>
             </div>
             <div className="mt-4 d-flex justify-content-between align-items-center">
-              <button className={`btn btn-lg ${allCompleted ? 'btn-success shadow' : 'btn-outline-secondary'}`} disabled={!allCompleted} onClick={() => {/* cert logic */}}>
-                Download Certificate
-              </button>
+              <button
+  className={`btn btn-lg ${
+    allCompleted ? "btn-success shadow" : "btn-outline-secondary"
+  }`}
+  disabled={!allCompleted}
+  onClick={async () => {
+    try {
+      const response = await API.get(
+        `/users/certificate/${id}`,
+        { responseType: "blob" }
+      );
+
+      const blob = new Blob([response.data], {
+        type: "application/pdf",
+      });
+
+      const url = window.URL.createObjectURL(blob);
+
+      const link = document.createElement("a");
+      link.href = url;
+      link.download = `certificate-${course.C_title}.pdf`;
+
+      document.body.appendChild(link);
+      link.click();
+      link.remove();
+
+      window.URL.revokeObjectURL(url);
+
+    } catch (error) {
+      console.error("Certificate Download Error:", error);
+      alert("Certificate generation failed");
+    }
+  }}
+>
+  Download Certificate
+</button>
               {!allCompleted && <small className="text-muted">Finish all videos to claim certificate</small>}
             </div>
           </div>

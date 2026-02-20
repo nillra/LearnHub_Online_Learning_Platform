@@ -16,7 +16,7 @@ function Register() {
     e.preventDefault(); 
     try {
       // Backend route: router.post("/register", registerUser)
-      await API.post("/auth/register", form);
+      await API.post("/users/register", form);
       alert("Registration Successful");
       navigate("/login");
     } catch (err) {
